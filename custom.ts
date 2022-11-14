@@ -102,10 +102,14 @@ namespace mp {
 
             this.buttonHandlers.push(new ButtonHandler(button, event, handler));
 
-            for (let player = 1; player < 5; player++) {
-                getButton(getController(player), button).onEvent(event, () => {
-                    this.getButtonHandler(button, event).handler(player);
+            const registerHandler = (p: number) => {
+                getButton(getController(p), button).onEvent(event, () => {
+                    this.getButtonHandler(button, event).handler(p);
                 });
+            }
+
+            for (let player = 1; player < 5; player++) {
+                registerHandler(player)
             }
         }
 
@@ -119,19 +123,27 @@ namespace mp {
 
             this.scoreHandlers.push(new ScoreHandler(score, handler));
 
-            for (let player = 1; player < 5; player++) {
-                getInfo(player).onScore(score, () => {
-                    this.getScoreHandler(score).handler(player);
+            const registerHandler = (p: number) => {
+                getInfo(p).onScore(score, () => {
+                    this.getScoreHandler(score).handler(p);
                 });
+            }
+
+            for (let player = 1; player < 5; player++) {
+                registerHandler(player);
             }
         }
 
         onLifeZero(handler: (playerNumber: number) => void) {
             if (!this.lifeZeroHandler) {
-                for (let player = 1; player < 5; player++) {
-                    getInfo(player).onLifeZero(() => {
-                        this.lifeZeroHandler(player);
+                const registerHandler = (p: number) => {
+                    getInfo(p).onLifeZero(() => {
+                        this.lifeZeroHandler(p);
                     });
+                }
+
+                for (let player = 1; player < 5; player++) {
+                    registerHandler(player);
                 }
             }
 
