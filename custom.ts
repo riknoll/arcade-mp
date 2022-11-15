@@ -1,7 +1,7 @@
 //% color="#207a77"
 //% icon="\uf0c0"
 //% block=Multiplayer
-//% groups='["Controller", "Info", "Other"]'
+//% groups='["Sprites", "Controller", "Info", "Utility"]'
 namespace mp {
     export enum PlayerNumber {
         //% block="1"
@@ -296,10 +296,43 @@ namespace mp {
         return stateStack[stateStack.length - 1];
     }
 
-    //% blockId=mp_moveWithButtons
-    //% block="$player control $sprite with buttons||vx $vx vy $vy"
+    //% blockId=mp_setPlayerSprite
+    //% block="set $player sprite to $sprite"
     //% player.shadow=mp_playernumber
     //% sprite.shadow=spritescreate
+    //% group=Sprites
+    //% weight=75
+    //% blockGap=8
+    export function setPlayerSprite(player: number, sprite: Sprite) {
+        _state().setPlayerSprite(player, sprite);
+    }
+
+    //% blockId=mp_getPlayerSprite
+    //% block="$player sprite"
+    //% player.shadow=mp_playernumber
+    //% group=Sprites
+    //% weight=70
+    //% blockGap=8
+    export function getPlayerSprite(player: number): Sprite {
+        return _state().getPlayerSprite(player);
+    }
+
+    //% blockId=mp_isPlayerSprite
+    //% block="is $sprite $player sprite"
+    //% sprite.shadow=variables_get
+    //% sprite.defl=mySprite
+    //% player.shadow=mp_playernumber
+    //% group=Sprites
+    //% weight=60
+    export function isPlayerSprite(sprite: Sprite, player: number): boolean {
+        return getPlayerSprite(player) === sprite;
+    }
+
+    //% blockId=mp_moveWithButtons
+    //% block="$player move $sprite with buttons||vx $vx vy $vy"
+    //% player.shadow=mp_playernumber
+    //% sprite.shadow=variables_get
+    //% sprite.defl=mySprite
     //% vx.defl=100
     //% vy.defl=100
     //% vx.shadow="spriteSpeedPicker"
@@ -310,7 +343,6 @@ namespace mp {
     //% weight=100
     export function moveWithButtons(player: number, sprite: Sprite, vx?: number, vy?: number) {
         getController(player).moveSprite(sprite, vx, vy);
-        _state().setPlayerSprite(player, sprite);
     }
 
     //% blockId=mp_onButtonEvent
@@ -330,27 +362,6 @@ namespace mp {
     //% blockGap=8
     export function isButtonPressed(player: number, button: MultiplayerButton): boolean {
         return getButton(getController(player), button).isPressed();
-    }
-
-    //% blockId=mp_getPlayerSprite
-    //% block="sprite controlled by $player"
-    //% player.shadow=mp_playernumber
-    //% group=Controller
-    //% weight=70
-    //% blockGap=8
-    export function getPlayerSprite(player: number): Sprite {
-        return _state().getPlayerSprite(player);
-    }
-
-    //% blockId=mp_isPlayerSprite
-    //% block="is $sprite controlled by $player"
-    //% sprite.shadow=variables_get
-    //% sprite.defl=mySprite
-    //% player.shadow=mp_playernumber
-    //% group=Controller
-    //% weight=60
-    export function isPlayerSprite(sprite: Sprite, player: number): boolean {
-        return getPlayerSprite(player) === sprite;
     }
 
     //% blockId=mp_getPlayerState
@@ -424,7 +435,7 @@ namespace mp {
     //% block="set player indicators $visible"
     //% visible.shadow=toggleOnOff
     //% visible.defl=true
-    //% group=Other
+    //% group=Utility
     //% weight=100
     export function setPlayerIndicatorsVisible(visible: boolean) {
         _state().setPlayerIndicatorsVisible(visible);
@@ -435,7 +446,7 @@ namespace mp {
     //% toCheck.shadow=variables_get
     //% toCheck.defl=player
     //% player.shadow=mp_playernumber
-    //% group=Other
+    //% group=Utility
     //% weight=90
     export function isPlayer(toCheck: number, player: number): boolean {
         return toCheck === player;
@@ -443,10 +454,32 @@ namespace mp {
 
     //% blockId=mp_allPlayers
     //% block="array of all players"
-    //% group=Other
+    //% group=Utility
     //% weight=80
     export function allPlayers(): number[] {
         return [1, 2, 3, 4];
+    }
+
+    //% blockId=mp_indexToPlayer
+    //% block="$index to player number"
+    //% index.shadow=variables_get
+    //% index.defl=index
+    //% group=Utility
+    //% weight=70
+    //% blockGap=8
+    export function indexToPlayer(index: number) {
+        if (index < 0 || index > 3) return -1;
+        return (index | 0) + 1;
+    }
+
+    //% blockId=mp_playerToIndex
+    //% block="$player to index"
+    //% player.shadow=mp_playernumber
+    //% group=Utility
+    //% weight=60
+    export function playerToIndex(player: number) {
+        if (player < 1 || player > 4) return -1;
+        return (player | 0) - 1;
     }
 
     function getController(player: number) {
